@@ -7,6 +7,7 @@ from aiogram.enums import ParseMode
 
 from config.config import Config
 from app.bot.services.alarm_checker import alarm_checker
+from app.bot.handlers.menu_commands import menu_commands_router
 from app.bot.handlers.others import others_router
 
 logger = logging.getLogger(__name__)
@@ -25,6 +26,7 @@ async def main(config: Config) -> None:
     # Получаем роутеры в нужном порядке
     logger.info("Including Routers...")
     dp.include_routers(
+        menu_commands_router,
         others_router,
     )
 
