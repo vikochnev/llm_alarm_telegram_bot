@@ -1,5 +1,5 @@
 from app.bot.services.parse_datetime import convert_str_to_datetime
-from infrastructure.database.database import alarms
+from app.infrastructure.database.database import alarms
 
 
 async def process_llm_response(response: dict, chat_id: int) -> str:

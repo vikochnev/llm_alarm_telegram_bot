@@ -5,7 +5,7 @@ import asyncio
 
 from app.bot.services.send_scheduled_message import send_alarm_message
 
-from infrastructure.database.database import alarms
+from app.infrastructure.database.database import alarms
 
 from config.config import load_config
 
