@@ -1,8 +1,15 @@
 from app.bot.services.parse_datetime import convert_str_to_datetime
 from app.infrastructure.database.database import alarms
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 async def process_llm_response(response: dict, chat_id: int) -> str:
+    logger.debug(f'Processing LLM response:\n{response}')
+    if 'query_type' not in response.keys():
+        return response["answer"]
     match response["query_type"]:
         case "set_alarms":
             if chat_id not in alarms.keys():
@@ -21,5 +28,6 @@ async def process_llm_response(response: dict, chat_id: int) -> str:
             else:
                 answer = "TODO: add delete_alarms"
         case _:
-            answer = "Your query is unrelated"
+            # TODO добавить нормальный обработчик ошибок
+            answer = "I have experienced unexpected error :("
     return answer
