@@ -1,5 +1,4 @@
 from app.bot.services.parse_datetime import convert_str_to_datetime
-from app.infrastructure.database.database import db
 
 import logging
 
