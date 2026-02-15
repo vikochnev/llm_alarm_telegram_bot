@@ -15,12 +15,13 @@ def parse_cron_to_string(cron: CronSettings):
 def parse_cron_from_string(cron_string: str):
     try:
         assert CronValidator.parse(cron_string)
+        cron_list = cron_string.split()
         cron = CronSettings()
-        cron.minute = cron_string[0]
-        cron.hour = cron_string[1]
-        cron.day_of_month = cron_string[2]
-        cron.month = cron_string[3]
-        cron.day_of_week = cron_string[4]
+        cron.minute = cron_list[0]
+        cron.hour = cron_list[1]
+        cron.day_of_month = cron_list[2]
+        cron.month = cron_list[3]
+        cron.day_of_week = cron_list[4]
         return cron
     except ValueError as e:
         logger.error(f'Could not parse cron settings from string to CronSettings: {e}')

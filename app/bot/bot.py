@@ -1,4 +1,5 @@
 import logging
+import psycopg_pool
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
@@ -16,12 +17,15 @@ logger = logging.getLogger(__name__)
 async def main(config: Config) -> None:
     logger.info("Starting bot...")
 
-    # Инициализируем бот и диспетчер
+    # Initialising bot and dispatcher
     bot = Bot(
         token=config.bot.token,
         default=DefaultBotProperties(parse_mode=ParseMode.HTML)
     )
     dp = Dispatcher()
+
+    # Creating connection pool for Postgres
+    # db_pool: psycopg_pool.AsyncConnectionPool = await
 
     # Получаем роутеры в нужном порядке
     logger.info("Including Routers...")

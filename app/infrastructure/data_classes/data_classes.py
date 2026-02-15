@@ -3,7 +3,7 @@ from typing import Literal
 from datetime import datetime
 class UserSettings(BaseModel):
     timezone: str  # For storing as IANA name
-    language: Literal['ru', 'en'] = 'ru'
+    language: Literal['Russian', 'English'] = 'Russian'
 
 
 class CronSettings(BaseModel):
