@@ -44,6 +44,11 @@ class LoggerSettings:
 
 
 @dataclass
+class OrmSettings:
+    base_url: str
+
+
+@dataclass
 class ConstSettings:
     sleep_interval: int
     datetime_format: str
@@ -53,9 +58,10 @@ class ConstSettings:
 class Config:
     bot: BotSettings
     llm: LlmSettings
-    #db: DatabaseSettings
-    #redis: RedisSettings
+    # db: DatabaseSettings
+    # redis: RedisSettings
     log: LoggerSettings
+    orm: OrmSettings
     const: ConstSettings
 
 
@@ -70,25 +76,19 @@ def load_config(path: str | None = None) -> Config:
 
     env.read_env(path)
 
-    bot_token = env("BOT_TOKEN")
+    bot_settings = BotSettings(
+        token=env.str("BOT_TOKEN"),
+    )
 
-    if not bot_token:
-        raise ValueError("BOT_TOKEN must not be empty")
+    llm_settings = LlmSettings(
+        token=env.str("LLM_API_TOKEN"),
+        model=env.str("LLM_MODEL"),
+        base_url=env.str("LLM_BASE_URL"),
+    )
 
-    llm_token = env("LLM_API_TOKEN")
-
-    if not llm_token:
-        raise ValueError("LLM_API_TOKEN must not be empty")
-
-    llm_model = env("LLM_MODEL")
-
-    if not llm_model:
-        raise ValueError("LLM_MODEL must not be empty")
-
-    llm_base_url = env("LLM_BASE_URL")
-
-    if not llm_base_url:  # Проверить необходимость параметра для запуска лмм
-        raise ValueError("LLM_BASE_URL must not be empty")
+    orm_settings = OrmSettings(
+        base_url=env.str("ORM_BASE_URL"),
+    )
 
     logger_settings = LoggerSettings(
         level=env.str("LOG_LEVEL"),
@@ -103,8 +103,9 @@ def load_config(path: str | None = None) -> Config:
     logger.info("Configuration loaded successfully")
 
     return Config(
-        bot=BotSettings(token=bot_token),
-        llm=LlmSettings(token=llm_token, model=llm_model, base_url=llm_base_url),
+        bot=bot_settings,
+        llm=llm_settings,
         log=logger_settings,
+        orm=orm_settings,
         const=const_settings,
     )

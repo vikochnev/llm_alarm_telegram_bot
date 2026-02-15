@@ -1,4 +1,3 @@
-import asyncio
 import logging
 
 from aiogram import Bot, Dispatcher
@@ -6,7 +5,8 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 
 from config.config import Config
-from app.bot.services.alarm_checker import alarm_checker
+from app.bot.scheduler.scheduler import scheduler
+from app.bot.scheduler.tasks.clean_database_from_due_alarms import clean_database_from_due_alarms
 from app.bot.handlers.menu_commands import menu_commands_router
 from app.bot.handlers.others import others_router
 
@@ -30,7 +30,9 @@ async def main(config: Config) -> None:
         others_router,
     )
 
-    asyncio.create_task(alarm_checker(bot))
+    scheduler.start()
+    logger.debug('Scheduler started...')
+    clean_database_from_due_alarms()
 
     # Запускаем поллинг
     try:
@@ -40,6 +42,3 @@ async def main(config: Config) -> None:
         logger.exception(e)
 
     # Запускаем проверку алармов
-
-
-
