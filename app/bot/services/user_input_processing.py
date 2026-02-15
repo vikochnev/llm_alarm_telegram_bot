@@ -1,4 +1,4 @@
-from app.bot.services.parse_datetime import convert_str_to_datetime
+from app.bot.services.datetime_parsers import convert_str_to_datetime
 
 import logging
 
