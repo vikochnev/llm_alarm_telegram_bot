@@ -59,7 +59,7 @@ class Config:
     bot: BotSettings
     llm: LlmSettings
     # db: DatabaseSettings
-    # redis: RedisSettings
+    redis: RedisSettings
     log: LoggerSettings
     orm: OrmSettings
     const: ConstSettings
@@ -84,6 +84,14 @@ def load_config(path: str | None = None) -> Config:
         token=env.str("LLM_API_TOKEN"),
         model=env.str("LLM_MODEL"),
         base_url=env.str("LLM_BASE_URL"),
+    )
+
+    redis_settings = RedisSettings(
+        host=env.str("REDIS_HOST"),
+        port=env.str("REDIS_PORT"),
+        db=env.int("REDIS_DATABASE"),
+        username=env.str("REDIS_USERNAME"),
+        password=env.str("REDIS_PASSWORD"),
     )
 
     orm_settings = OrmSettings(

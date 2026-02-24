@@ -1,5 +1,4 @@
 import logging
-import psycopg_pool
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
@@ -7,7 +6,6 @@ from aiogram.enums import ParseMode
 
 from config.config import Config
 from app.bot.scheduler.scheduler import scheduler
-from app.bot.scheduler.tasks.clean_database_from_due_alarms import clean_database_from_due_alarms
 from app.bot.handlers.menu_commands import menu_commands_router
 from app.bot.handlers.others import others_router
 
@@ -24,9 +22,6 @@ async def main(config: Config) -> None:
     )
     dp = Dispatcher()
 
-    # Creating connection pool for Postgres
-    # db_pool: psycopg_pool.AsyncConnectionPool = await
-
     # Получаем роутеры в нужном порядке
     logger.info("Including Routers...")
     dp.include_routers(
@@ -36,7 +31,6 @@ async def main(config: Config) -> None:
 
     scheduler.start()
     logger.debug('Scheduler started...')
-    clean_database_from_due_alarms()
 
     # Запускаем поллинг
     try:
