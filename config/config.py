@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 # config constants
 # REDIS_DEFAULT_TTL = 60
 DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
+TIMEOUT_DELETE_HOURS: int = 6
 
 
 @dataclass
@@ -56,6 +57,7 @@ class OrmSettings:
 @dataclass
 class ConstSettings:
     datetime_format: str
+    timeout_delete_hours: int
 
 
 @dataclass
@@ -118,6 +120,7 @@ def load_config(path: str | None = None) -> Config:
 
     const_settings = ConstSettings(
         datetime_format=DATETIME_FORMAT,
+        timeout_delete_hours=TIMEOUT_DELETE_HOURS,
     )
 
     logger.info("Configuration loaded successfully")
