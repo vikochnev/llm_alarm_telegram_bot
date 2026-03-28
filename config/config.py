@@ -10,6 +10,8 @@ logger = logging.getLogger(__name__)
 # REDIS_DEFAULT_TTL = 60
 DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 TIMEOUT_DELETE_HOURS: int = 6
+SCHEDULER_DELETE_DUE_ALARMS_INTERVAL_M: int = 60
+SCHEDULER_HARD_DELETE_ALARMS_INTERVAL_M: int = 60
 
 
 @dataclass
@@ -58,6 +60,8 @@ class OrmSettings:
 class ConstSettings:
     datetime_format: str
     timeout_delete_hours: int
+    scheduler_delete_due_alarms_interval_m: int
+    scheduler_hard_delete_alarms_interval_m: int
 
 
 @dataclass
@@ -121,6 +125,8 @@ def load_config(path: str | None = None) -> Config:
     const_settings = ConstSettings(
         datetime_format=DATETIME_FORMAT,
         timeout_delete_hours=TIMEOUT_DELETE_HOURS,
+        scheduler_delete_due_alarms_interval_m=SCHEDULER_DELETE_DUE_ALARMS_INTERVAL_M,
+        scheduler_hard_delete_alarms_interval_m=SCHEDULER_HARD_DELETE_ALARMS_INTERVAL_M,
     )
 
     logger.info("Configuration loaded successfully")
