@@ -7,7 +7,6 @@ from environs import Env
 logger = logging.getLogger(__name__)
 
 # config constants
-# REDIS_DEFAULT_TTL = 60
 DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 TIMEOUT_DELETE_HOURS: int = 6
 SCHEDULER_DELETE_DUE_ALARMS_INTERVAL_M: int = 60
