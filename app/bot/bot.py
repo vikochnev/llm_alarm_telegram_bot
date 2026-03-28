@@ -9,6 +9,7 @@ from app.bot.scheduler.scheduler import scheduler
 from app.bot.handlers.menu_commands import menu_commands_router
 from app.bot.handlers.others import others_router
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -38,5 +39,3 @@ async def main(config: Config) -> None:
         await dp.start_polling(bot)
     except Exception as e:
         logger.exception(e)
-
-    # Запускаем проверку алармов

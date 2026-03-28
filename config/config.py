@@ -6,6 +6,10 @@ from environs import Env
 
 logger = logging.getLogger(__name__)
 
+# config constants
+# REDIS_DEFAULT_TTL = 60
+DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
+
 
 @dataclass
 class BotSettings:
@@ -28,13 +32,14 @@ class DatabaseSettings:
     password: str
 
 
-@dataclass
-class RedisSettings:
-    host: str
-    port: str
-    db: int
-    password: str
-    username: str
+# @dataclass
+# class RedisSettings:
+#     host: str
+#     port: str
+#     db: int
+#     password: str
+#     username: str
+#     default_ttl: int
 
 
 @dataclass
@@ -50,7 +55,6 @@ class OrmSettings:
 
 @dataclass
 class ConstSettings:
-    sleep_interval: int
     datetime_format: str
 
 
@@ -58,8 +62,8 @@ class ConstSettings:
 class Config:
     bot: BotSettings
     llm: LlmSettings
-    # db: DatabaseSettings
-    redis: RedisSettings
+    db: DatabaseSettings
+    # redis: RedisSettings
     log: LoggerSettings
     orm: OrmSettings
     const: ConstSettings
@@ -86,13 +90,22 @@ def load_config(path: str | None = None) -> Config:
         base_url=env.str("LLM_BASE_URL"),
     )
 
-    redis_settings = RedisSettings(
-        host=env.str("REDIS_HOST"),
-        port=env.str("REDIS_PORT"),
-        db=env.int("REDIS_DATABASE"),
-        username=env.str("REDIS_USERNAME"),
-        password=env.str("REDIS_PASSWORD"),
+    db_settings = DatabaseSettings(
+        name=env.str('POSTGRES_DB'),
+        host=env.str('POSTGRES_HOST'),
+        port=env.str('POSTGRES_PORT'),
+        user=env.str('POSTGRES_USER'),
+        password=env.str('POSTGRES_PASSWORD'),
     )
+
+    # redis_settings = RedisSettings(
+    #     host=env.str("REDIS_HOST"),
+    #     port=env.str("REDIS_PORT"),
+    #     db=env.int("REDIS_DATABASE"),
+    #     username=env.str("REDIS_USERNAME"),
+    #     password=env.str("REDIS_PASSWORD"),
+    #     default_ttl=REDIS_DEFAULT_TTL,
+    # )
 
     orm_settings = OrmSettings(
         base_url=env.str("ORM_BASE_URL"),
@@ -104,8 +117,7 @@ def load_config(path: str | None = None) -> Config:
     )
 
     const_settings = ConstSettings(
-        sleep_interval=env.int("SLEEP_INTERVAL"),
-        datetime_format=env.str("DATETIME_FORMAT"),
+        datetime_format=DATETIME_FORMAT,
     )
 
     logger.info("Configuration loaded successfully")
@@ -114,6 +126,8 @@ def load_config(path: str | None = None) -> Config:
         bot=bot_settings,
         llm=llm_settings,
         log=logger_settings,
+        db=db_settings,
+        # redis=redis_settings,
         orm=orm_settings,
         const=const_settings,
     )

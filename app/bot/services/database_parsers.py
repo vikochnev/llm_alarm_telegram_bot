@@ -1,21 +1,28 @@
-from app.infrastructure.data_classes.data_classes import AlarmJoinedOnUser, UserSettings
-from app.bot.services.cron_parsers import parse_cron_from_string
+from datetime import datetime
+from sqlalchemy import select
 
-def joined_row_parser(row) -> AlarmJoinedOnUser:
-    user, alarm = row
-    if alarm.cron is not None:
-        cron = parse_cron_from_string(alarm.cron)
-    else:
-        cron = None
-    alarm_joined_on_user = AlarmJoinedOnUser(
-        alarm_id=alarm.alarm_id,
-        chat_id=alarm.chat_id,
-        user_settings=UserSettings(
-            timezone=user.timezone,
-            language=user.language,
-        ),
-        is_repeated=alarm.is_repeated,
-        datetime=alarm.datetime,
-        cron=cron,
-    )
-    return alarm_joined_on_user
+from app.infrastructure.database.core import async_session_maker
+from app.infrastructure.database.models import User, Alarm
+from app.infrastructure.database.queries import delete_alarm
+
+
+
+async def get_user_table():
+    async with async_session_maker() as session:
+        stmt = select(User)
+        result = await session.execute(stmt)
+        return result.scalars().all()
+
+async def get_alarms_table():
+    async with async_session_maker() as session:
+        stmt = select(Alarm)
+        result = await session.execute(stmt)
+        return result.scalars().all()
+
+async def delete_due_alarms():
+    async with async_session_maker() as session:
+        stmt = select(Alarm).where(Alarm.date_time < datetime.now())
+        result = await session.execute(stmt)
+        alarms = result.scalars().all()
+        for alarm in alarms:
+            await delete_alarm(alarm_id=alarm.id)
