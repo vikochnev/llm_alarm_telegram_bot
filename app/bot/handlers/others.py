@@ -5,7 +5,7 @@ from aiogram import Router
 from aiogram.types import Message
 
 from app.bot.llm.llm_queries import get_general_llm_response
-from app.bot.services.user_input_processing import process_llm_response
+from app.bot.services.llm_response_processing import process_llm_response
 
 logger = logging.getLogger(__name__)
 
