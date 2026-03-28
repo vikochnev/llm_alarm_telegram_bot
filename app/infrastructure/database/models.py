@@ -10,8 +10,9 @@ class Alarm(Base):
     alarm_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     chat_id = Column(Integer, ForeignKey('users.chat_id'), nullable=False)
     is_repeated = Column(Boolean, default=False, nullable=False)
-    datetime = Column(DateTime(timezone=True), index=True, nullable=True)
+    date_time = Column(DateTime(timezone=True), index=True, nullable=True)
     cron = Column(String, index = True, nullable = True)
+    deleted_at = Column(DateTime(timezone=True), default=None, nullable=True)
 
 class User(Base):
     __tablename__ = "users"

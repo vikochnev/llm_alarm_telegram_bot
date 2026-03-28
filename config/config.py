@@ -6,6 +6,12 @@ from environs import Env
 
 logger = logging.getLogger(__name__)
 
+# config constants
+DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
+TIMEOUT_DELETE_HOURS: int = 6
+SCHEDULER_DELETE_DUE_ALARMS_INTERVAL_M: int = 60
+SCHEDULER_HARD_DELETE_ALARMS_INTERVAL_M: int = 60
+
 
 @dataclass
 class BotSettings:
@@ -28,13 +34,14 @@ class DatabaseSettings:
     password: str
 
 
-@dataclass
-class RedisSettings:
-    host: str
-    port: str
-    db: int
-    password: str
-    username: str
+# @dataclass
+# class RedisSettings:
+#     host: str
+#     port: str
+#     db: int
+#     password: str
+#     username: str
+#     default_ttl: int
 
 
 @dataclass
@@ -50,15 +57,17 @@ class OrmSettings:
 
 @dataclass
 class ConstSettings:
-    sleep_interval: int
     datetime_format: str
+    timeout_delete_hours: int
+    scheduler_delete_due_alarms_interval_m: int
+    scheduler_hard_delete_alarms_interval_m: int
 
 
 @dataclass
 class Config:
     bot: BotSettings
     llm: LlmSettings
-    # db: DatabaseSettings
+    db: DatabaseSettings
     # redis: RedisSettings
     log: LoggerSettings
     orm: OrmSettings
@@ -86,8 +95,25 @@ def load_config(path: str | None = None) -> Config:
         base_url=env.str("LLM_BASE_URL"),
     )
 
+    db_settings = DatabaseSettings(
+        name=env.str('POSTGRES_DB'),
+        host=env.str('POSTGRES_HOST'),
+        port=env.str('POSTGRES_PORT'),
+        user=env.str('POSTGRES_USER'),
+        password=env.str('POSTGRES_PASSWORD'),
+    )
+
+    # redis_settings = RedisSettings(
+    #     host=env.str("REDIS_HOST"),
+    #     port=env.str("REDIS_PORT"),
+    #     db=env.int("REDIS_DATABASE"),
+    #     username=env.str("REDIS_USERNAME"),
+    #     password=env.str("REDIS_PASSWORD"),
+    #     default_ttl=REDIS_DEFAULT_TTL,
+    # )
+
     orm_settings = OrmSettings(
-        base_url=env.str("ORM_BASE_URL"),
+        base_url=f'postgresql+asyncpg://{db_settings.user}:{db_settings.password}@{db_settings.host}:{db_settings.port}/alarms_bot_db',
     )
 
     logger_settings = LoggerSettings(
@@ -96,8 +122,10 @@ def load_config(path: str | None = None) -> Config:
     )
 
     const_settings = ConstSettings(
-        sleep_interval=env.int("SLEEP_INTERVAL"),
-        datetime_format=env.str("DATETIME_FORMAT"),
+        datetime_format=DATETIME_FORMAT,
+        timeout_delete_hours=TIMEOUT_DELETE_HOURS,
+        scheduler_delete_due_alarms_interval_m=SCHEDULER_DELETE_DUE_ALARMS_INTERVAL_M,
+        scheduler_hard_delete_alarms_interval_m=SCHEDULER_HARD_DELETE_ALARMS_INTERVAL_M,
     )
 
     logger.info("Configuration loaded successfully")
@@ -106,6 +134,8 @@ def load_config(path: str | None = None) -> Config:
         bot=bot_settings,
         llm=llm_settings,
         log=logger_settings,
+        db=db_settings,
+        # redis=redis_settings,
         orm=orm_settings,
         const=const_settings,
     )

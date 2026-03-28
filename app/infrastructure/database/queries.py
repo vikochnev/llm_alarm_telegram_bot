@@ -1,24 +1,16 @@
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.infrastructure.database.core import async_session_maker
 from app.infrastructure.database.models import User, Alarm
-from app.infrastructure.data_classes.data_classes import CronSettings, AlarmJoinedOnUser
+from app.infrastructure.data_classes.data_classes import CronSettings
 from app.bot.services.cron_parsers import parse_cron_to_string
 
 from logging import Logger
 
 logger = Logger(__name__)
-
-
-async def get_alarms_joined_on_users() -> list:
-    async with async_session_maker() as session:
-        stmt = select(User, Alarm).join(Alarm, User.chat_id == Alarm.chat_id)
-        result = await session.execute(stmt)
-        rows = result.all()
-        return rows
 
 
 async def create_user(*, chat_id: int, timezone: str, language: str) -> User:
@@ -39,7 +31,7 @@ async def create_one_time_alarm(*, chat_id: int, date_time: datetime) -> Alarm:
         alarm = Alarm(
             chat_id=chat_id,
             is_repeated=False,
-            datetime=date_time,
+            date_time=date_time,
             cron=None,
         )
         session.add(alarm)
@@ -55,7 +47,7 @@ async def create_recurring_alarm(*, chat_id: int, cron: CronSettings) -> Alarm:
         alarm = Alarm(
             chat_id=chat_id,
             is_repeated=True,
-            datetime=None,
+            date_time=None,
             cron=cron_string,
         )
         session.add(alarm)
@@ -71,5 +63,34 @@ async def delete_alarm(*, alarm_id: int) -> None:
             alarm = await session.get(Alarm, alarm_id)
             await session.delete(alarm)
             await session.commit()
+            logger.debug(f"Alarm deleted: {alarm}")
+        except:
+            logger.debug(f"Alarm with id {alarm_id} was not found")
+
+
+async def soft_delete_alarm(*, alarm_id: int) -> None:
+    async with async_session_maker() as session:
+        try:
+            alarm = await session.get(Alarm, alarm_id)
+            if not alarm.deleted_at:
+                alarm.deleted_at = datetime.now(timezone.utc)
+                await session.commit()
+                logger.debug(f"Alarm with id {alarm_id} was soft deleted at {alarm.deleted_at}")
+            else:
+                logger.debug(f"Alarm with id {alarm_id} is already marked as soft deleted at {alarm.deleted_at}")
+        except:
+            logger.debug(f"Alarm with id {alarm_id} was not found")
+
+
+async def revert_soft_delete_alarm(*, alarm_id: int) -> None:
+    async with async_session_maker() as session:
+        try:
+            alarm = await session.get(Alarm, alarm_id)
+            if alarm.deleted_at:
+                alarm.deleted_at = None
+                await session.commit()
+                logger.debug(f"Alarm with id {alarm_id} soft deletion was reverted")
+            else:
+                logger.debug(f"Alarm with id {alarm_id} is already marked as not soft deleted")
         except:
             logger.debug(f"Alarm with id {alarm_id} was not found")
