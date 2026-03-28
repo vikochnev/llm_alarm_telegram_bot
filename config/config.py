@@ -113,7 +113,7 @@ def load_config(path: str | None = None) -> Config:
     # )
 
     orm_settings = OrmSettings(
-        base_url=env.str("ORM_BASE_URL"),
+        base_url=f'postgresql+asyncpg://{db_settings.user}:{db_settings.password}@{db_settings.host}:{db_settings.port}/alarms_bot_db',
     )
 
     logger_settings = LoggerSettings(
