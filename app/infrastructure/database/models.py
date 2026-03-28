@@ -12,6 +12,7 @@ class Alarm(Base):
     is_repeated = Column(Boolean, default=False, nullable=False)
     date_time = Column(DateTime(timezone=True), index=True, nullable=True)
     cron = Column(String, index = True, nullable = True)
+    deleted_at = Column(DateTime(timezone=True), default=None, nullable=True)
 
 class User(Base):
     __tablename__ = "users"

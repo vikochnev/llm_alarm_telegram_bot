@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import select
 
 from app.infrastructure.database.core import async_session_maker
@@ -21,8 +21,8 @@ async def get_alarms_table():
 
 async def delete_due_alarms():
     async with async_session_maker() as session:
-        stmt = select(Alarm).where(Alarm.date_time < datetime.now())
+        stmt = select(Alarm).where(Alarm.date_time < datetime.now(timezone.utc))
         result = await session.execute(stmt)
         alarms = result.scalars().all()
         for alarm in alarms:
-            await delete_alarm(alarm_id=alarm.id)
+            await delete_alarm(alarm_id=alarm.alarm_id)
