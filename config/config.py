@@ -11,6 +11,7 @@ DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 TIMEOUT_DELETE_HOURS: int = 6
 SCHEDULER_DELETE_DUE_ALARMS_INTERVAL_M: int = 60
 SCHEDULER_HARD_DELETE_ALARMS_INTERVAL_M: int = 60
+SCHEDULER_UPDATE_LOCAL_MEMORY_INTERVAL_S: int = 60
 
 
 @dataclass
@@ -61,6 +62,7 @@ class ConstSettings:
     timeout_delete_hours: int
     scheduler_delete_due_alarms_interval_m: int
     scheduler_hard_delete_alarms_interval_m: int
+    scheduler_update_local_memory_interval_s: int
 
 
 @dataclass
@@ -126,6 +128,7 @@ def load_config(path: str | None = None) -> Config:
         timeout_delete_hours=TIMEOUT_DELETE_HOURS,
         scheduler_delete_due_alarms_interval_m=SCHEDULER_DELETE_DUE_ALARMS_INTERVAL_M,
         scheduler_hard_delete_alarms_interval_m=SCHEDULER_HARD_DELETE_ALARMS_INTERVAL_M,
+        scheduler_update_local_memory_interval_s=SCHEDULER_UPDATE_LOCAL_MEMORY_INTERVAL_S
     )
 
     logger.info("Configuration loaded successfully")
