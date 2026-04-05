@@ -5,9 +5,8 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 
 from app.bot.scheduler.scheduler import scheduler
-from app.bot.scheduler.tasks.delete_due_alarms import add_delete_due_alarms_job
-from app.bot.scheduler.tasks.hard_delete_alarms import add_hard_delete_alarms_job
 from app.bot.services.database_parsers import delete_due_alarms, hard_delete_soft_deleted_alarms
+from app.bot.scheduler.scheduler_tasks_on_startup import add_startup_scheduler_jobs
 from app.bot.handlers.menu_commands import menu_commands_router
 from app.bot.handlers.others import others_router
 
@@ -39,8 +38,7 @@ async def main(config: Config) -> None:
     await hard_delete_soft_deleted_alarms()
 
     # Adding jobs to scheduler
-    add_delete_due_alarms_job()
-    add_hard_delete_alarms_job()
+    add_startup_scheduler_jobs()
 
     # Starting scheduler
     scheduler.start()

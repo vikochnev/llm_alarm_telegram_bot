@@ -1,4 +1,7 @@
 from datetime import datetime
+
+from app.bot.services.local_memory.functions import update_alarm_cache
+
 import logging
 
 from app.infrastructure.database.queries import (
@@ -36,6 +39,7 @@ async def _process_set_alarms(
         for cron in crons:
             alarm = await create_recurring_alarm(chat_id=chat_id, cron=parse_cron_from_string(cron))
             new_alarms_list.append(alarm)
+    await update_alarm_cache()
     return _form_set_alarms_response(new_alarms_list)
 
 
