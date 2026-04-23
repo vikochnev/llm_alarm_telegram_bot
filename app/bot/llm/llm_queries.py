@@ -1,6 +1,7 @@
-from openai import OpenAI
+from openai import OpenAI, APIError, BadRequestError, RateLimitError
 
-from app.bot.llm.instructions import general_instructions_template
+from app.bot.llm.instructions.general import general_instructions_template
+from app.bot.llm.instructions.timezone import timezone_instructions_template
 
 from datetime import datetime
 
@@ -18,12 +19,26 @@ client = OpenAI(
     api_key=config.llm.token,
 )
 
-
-async def get_general_llm_response(user_input):
+async def get_general_llm_response(user_input) -> str | None:
     logger.debug("Sending user query to LLM")
-    response = client.responses.create(
-        model=config.llm.model,
-        instructions=general_instructions_template.format(current_time=datetime.now()),
-        input=user_input
-    )
-    return response.output_text
+    try:
+        response = client.responses.create(
+            model=config.llm.model,
+            instructions=general_instructions_template.format(current_time=datetime.now()),
+            input=user_input
+        )
+        return response.output_text
+    except (APIError, BadRequestError, RateLimitError),  as e:
+        logger.error(e)
+
+async def get_timezone_llm_response(user_input) -> str | None:
+    try:
+        logger.debug("Sending timezone user query to LLM")
+        response = client.responses.create(
+            model=config.llm.model,
+            instructions=timezone_instructions_template,
+            input=user_input
+        )
+        return response.output_text
+    except (APIError, BadRequestError, RateLimitError), as e:
+        logger.error(e)

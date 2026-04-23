@@ -60,7 +60,7 @@ def _process_invalid() -> str:
     return 'Invalid query, please try again'
 
 
-async def process_llm_response(response: dict, chat_id: int) -> str:
+async def process_general_llm_response(response: dict, chat_id: int) -> str:
     logger.debug(f'Processing LLM response:\n{response}')
     match response['query_type']:
         case 'set_alarms':
@@ -74,3 +74,6 @@ async def process_llm_response(response: dict, chat_id: int) -> str:
         case _:
             logger.error(f'Invalid query type: {response["query_type"]}')
             return 'We have experienced unexpected error, please try again'
+
+async def process_timezone_llm_response() -> str:
+    pass

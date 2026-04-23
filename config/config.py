@@ -13,6 +13,7 @@ SCHEDULER_DELETE_DUE_ALARMS_INTERVAL_M: int = 60
 SCHEDULER_HARD_DELETE_ALARMS_INTERVAL_M: int = 60
 SCHEDULER_UPDATE_LOCAL_MEMORY_INTERVAL_S: int = 60
 SCHEDULER_JOB_LOGGING_INTERVAL_S: int = 60
+REDIS_DEFAULT_TTL_S: int = 300
 
 
 @dataclass
@@ -36,14 +37,14 @@ class DatabaseSettings:
     password: str
 
 
-# @dataclass
-# class RedisSettings:
-#     host: str
-#     port: str
-#     db: int
-#     password: str
-#     username: str
-#     default_ttl: int
+@dataclass
+class RedisSettings:
+    host: str
+    port: int
+    db: int
+    password: str
+    username: str
+    default_ttl: int
 
 
 @dataclass
@@ -72,7 +73,7 @@ class Config:
     bot: BotSettings
     llm: LlmSettings
     db: DatabaseSettings
-    # redis: RedisSettings
+    redis: RedisSettings
     log: LoggerSettings
     orm: OrmSettings
     const: ConstSettings
@@ -107,14 +108,14 @@ def load_config(path: str | None = None) -> Config:
         password=env.str('POSTGRES_PASSWORD'),
     )
 
-    # redis_settings = RedisSettings(
-    #     host=env.str("REDIS_HOST"),
-    #     port=env.str("REDIS_PORT"),
-    #     db=env.int("REDIS_DATABASE"),
-    #     username=env.str("REDIS_USERNAME"),
-    #     password=env.str("REDIS_PASSWORD"),
-    #     default_ttl=REDIS_DEFAULT_TTL,
-    # )
+    redis_settings = RedisSettings(
+        host=env.str("REDIS_HOST"),
+        port=env.int("REDIS_PORT"),
+        db=env.int("REDIS_DATABASE"),
+        username=env.str("REDIS_USERNAME"),
+        password=env.str("REDIS_PASSWORD"),
+        default_ttl=REDIS_DEFAULT_TTL_S,
+    )
 
     orm_settings = OrmSettings(
         base_url=f'postgresql+asyncpg://{db_settings.user}:{db_settings.password}@{db_settings.host}:{db_settings.port}/alarms_bot_db',
@@ -141,7 +142,7 @@ def load_config(path: str | None = None) -> Config:
         llm=llm_settings,
         log=logger_settings,
         db=db_settings,
-        # redis=redis_settings,
+        redis=redis_settings,
         orm=orm_settings,
         const=const_settings,
     )
